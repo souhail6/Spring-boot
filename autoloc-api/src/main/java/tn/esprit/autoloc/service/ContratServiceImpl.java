@@ -1,10 +1,12 @@
-﻿package tn.esprit.autoloc.service;
+package tn.esprit.autoloc.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Contrat;
+import tn.esprit.autoloc.domain.Paiement;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 import tn.esprit.autoloc.repository.IContratRepository;
 
@@ -35,13 +37,39 @@ public class ContratServiceImpl implements IContratService {
     @Override
     public Contrat update(Long id, Contrat entity) {
         Contrat existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idContrat");
+        BeanUtils.copyProperties(entity, existing, "idContrat", "paiements");
         return repository.save(existing);
     }
 
     @Override
     public void deleteById(Long id) {
         repository.delete(findById(id));
+    }
+
+    @Override
+    @Transactional
+    public Paiement addPaiement(Long contratId, Paiement paiement) {
+        if (paiement.getIdPaiement() != null) {
+            throw new IllegalArgumentException("Un nouveau paiement ne doit pas avoir d'identifiant");
+        }
+
+        Contrat contrat = findById(contratId);
+        contrat.addPaiement(paiement);
+        repository.save(contrat);
+        return paiement;
+    }
+
+    @Override
+    @Transactional
+    public void removePaiement(Long contratId, Long paiementId) {
+        Contrat contrat = findById(contratId);
+        Paiement paiement = contrat.getPaiements().stream()
+                .filter(item -> paiementId.equals(item.getIdPaiement()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Paiement", paiementId));
+
+        contrat.removePaiement(paiement);
+        repository.save(contrat);
     }
 }
 

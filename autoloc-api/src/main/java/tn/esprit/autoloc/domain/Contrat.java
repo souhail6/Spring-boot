@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "contrat")
@@ -34,4 +35,18 @@ public class Contrat {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_reservation", unique = true)
     private Reservation reservation;
+
+    public void addPaiement(Paiement paiement) {
+        Objects.requireNonNull(paiement, "Le paiement ne doit pas etre null");
+        paiements.add(paiement);
+        paiement.setContrat(this);
+    }
+
+    public boolean removePaiement(Paiement paiement) {
+        if (paiements.remove(paiement)) {
+            paiement.setContrat(null);
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,4 +1,4 @@
-﻿package tn.esprit.autoloc.exception;
+package tn.esprit.autoloc.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String ressource, Long id) {
