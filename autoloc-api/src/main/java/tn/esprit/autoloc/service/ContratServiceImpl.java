@@ -4,16 +4,17 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Contrat;
 import tn.esprit.autoloc.domain.Paiement;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 import tn.esprit.autoloc.repository.IContratRepository;
+import tn.esprit.autoloc.repository.IPaiementRepository;
 
 @Service
 @RequiredArgsConstructor
 public class ContratServiceImpl implements IContratService {
     private final IContratRepository repository;
+    private final IPaiementRepository paiementRepository;
 
     @Override
     public Contrat create(Contrat entity) {
@@ -37,7 +38,7 @@ public class ContratServiceImpl implements IContratService {
     @Override
     public Contrat update(Long id, Contrat entity) {
         Contrat existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idContrat", "paiements");
+        BeanUtils.copyProperties(entity, existing, "idContrat");
         return repository.save(existing);
     }
 
@@ -47,29 +48,24 @@ public class ContratServiceImpl implements IContratService {
     }
 
     @Override
-    @Transactional
     public Paiement addPaiement(Long contratId, Paiement paiement) {
         if (paiement.getIdPaiement() != null) {
             throw new IllegalArgumentException("Un nouveau paiement ne doit pas avoir d'identifiant");
         }
-
         Contrat contrat = findById(contratId);
-        contrat.addPaiement(paiement);
-        repository.save(contrat);
-        return paiement;
+        paiement.setContrat(contrat);
+        contrat.getPaiements().add(paiement);
+        return paiementRepository.save(paiement);
     }
 
     @Override
-    @Transactional
     public void removePaiement(Long contratId, Long paiementId) {
         Contrat contrat = findById(contratId);
-        Paiement paiement = contrat.getPaiements().stream()
-                .filter(item -> paiementId.equals(item.getIdPaiement()))
-                .findFirst()
+        Paiement paiement = paiementRepository.findById(paiementId)
                 .orElseThrow(() -> new ResourceNotFoundException("Paiement", paiementId));
-
-        contrat.removePaiement(paiement);
-        repository.save(contrat);
+        if (!contrat.getPaiements().remove(paiement)) {
+            throw new ResourceNotFoundException("Paiement du contrat", paiementId);
+        }
+        paiementRepository.delete(paiement);
     }
 }
-

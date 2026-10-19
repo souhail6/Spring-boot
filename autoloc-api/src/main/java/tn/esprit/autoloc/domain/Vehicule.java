@@ -1,6 +1,7 @@
 package tn.esprit.autoloc.domain;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,19 +45,23 @@ public class Vehicule {
     @Column(nullable = false, length = 20)
     private StatutVehicule statut;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_agence")
     private Agence agence;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "vehicule_equipement",
             joinColumns = @JoinColumn(name = "vehicule_id_vehicule"),
             inverseJoinColumns = @JoinColumn(name = "equipement_id_equipement"))
     private Set<Equipement> equipements = new HashSet<>();
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "vehicule", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Maintenance> maintenances = new ArrayList<>();
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
     private List<Reservation> reservations = new ArrayList<>();
 }

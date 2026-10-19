@@ -35,7 +35,7 @@ public class EquipementServiceImpl implements IEquipementService {
     @Override
     public Equipement update(Long id, Equipement entity) {
         Equipement existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idEquipement");
+        BeanUtils.copyProperties(entity, existing, "idEquipement", "vehicules");
         return repository.save(existing);
     }
 

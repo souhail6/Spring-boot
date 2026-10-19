@@ -35,7 +35,7 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public Client update(Long id, Client entity) {
         Client existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idClient");
+        BeanUtils.copyProperties(entity, existing, "idClient", "reservations");
         return repository.save(existing);
     }
 

@@ -1,6 +1,7 @@
 package tn.esprit.autoloc.domain;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,14 +27,17 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private StatutReservation statut;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_client")
     private Client client;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_vehicule")
     private Vehicule vehicule;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Contrat contrat;
 }

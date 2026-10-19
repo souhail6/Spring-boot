@@ -35,7 +35,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
     @Override
     public Vehicule update(Long id, Vehicule entity) {
         Vehicule existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idVehicule");
+        BeanUtils.copyProperties(entity, existing, "idVehicule", "equipements", "maintenances", "reservations");
         return repository.save(existing);
     }
 

@@ -35,7 +35,7 @@ public class AgenceServiceImpl implements IAgenceService {
     @Override
     public Agence update(Long id, Agence entity) {
         Agence existing = findById(id);
-        BeanUtils.copyProperties(entity, existing, "idAgence");
+        BeanUtils.copyProperties(entity, existing, "idAgence", "vehicules", "employes");
         return repository.save(existing);
     }
 
